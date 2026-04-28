@@ -50,15 +50,20 @@ export function useHandAR({
     let stream: MediaStream;
     const init = async () => {
       const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        "/wasm/mediapipe" // https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.10/wasm
       );
+
+      // 2. Kiểm tra nếu landmarker đã tồn tại thì đóng trước khi tạo mới
+      if (landmarkerRef.current) {
+        await landmarkerRef.current.close();
+      }
 
       landmarkerRef.current = await HandLandmarker.createFromOptions(
         vision,
         {
           baseOptions: {
             modelAssetPath:
-              getFullCDNUrl("/cdn/hand_landmarker.task"),
+              "/assets/cdn/hand_landmarker.task",
             delegate: "GPU",
           },
           runningMode: "VIDEO",
