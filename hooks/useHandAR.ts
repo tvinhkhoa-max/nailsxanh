@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
-import { getFullStaticImageUrl } from "@/src/lib/utils";
+import { getFullStaticImageUrl, getFullCDNUrl } from "@/src/lib/utils";
 
 export function useHandAR({
   videoRef,
@@ -58,7 +58,7 @@ export function useHandAR({
         {
           baseOptions: {
             modelAssetPath:
-              "http://127.0.0.1:3333/public/cdn/hand_landmarker.task",
+              getFullCDNUrl("/cdn/hand_landmarker.task"),
             delegate: "GPU",
           },
           runningMode: "VIDEO",
