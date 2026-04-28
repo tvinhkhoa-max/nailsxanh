@@ -1,0 +1,27 @@
+/* src/styles/globals.css */
+@layer base {
+  :root {
+    --background: 60 30% 98%; /* Off-white */
+    --primary-sage: 120 15% 45%; /* Sage Green */
+    --accent-mint: 145 30% 88%; /* Mint Pastel */
+    --text-charcoal: 210 10% 23%; /* Charcoal Text */
+  }
+
+  body {
+    @apply bg-[hsl(var(--background))] text-[hsl(var(--text-charcoal))] font-light;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif; /* Font có chân cho tiêu đề */
+    @apply tracking-wide;
+  }
+}
+
+/* Hiệu ứng Glassmorphism cho AI Quiz */
+.glass-panel {
+  @apply bg-white/40 backdrop-blur-md border border-white/20 shadow-xl;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
