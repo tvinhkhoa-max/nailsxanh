@@ -164,7 +164,7 @@ const PCView = ({
 
           <button 
             type="button"
-            onClick={openBooking}
+            onClick={() => openBooking()}
             className="w-full mt-6 py-5 bg-[#5E7A5E] text-white rounded-[24px] font-black text-xs tracking-widest hover:bg-[#2D3A2D] transition-all shadow-lg"
          >
            ĐẶT LỊCH VỚI MẪU NÀY
