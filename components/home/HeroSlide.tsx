@@ -31,8 +31,8 @@ const heroSlides = [
     title: 'Studio<span class="text-[#5E7A5E] italic">Cá Nhân</span>',
     subtitle: 'Nơi vẻ đẹp<br/>lên tiếng',
     description: 'Thiết kế nail theo phong cách riêng của bạn, tôn vinh cá tính độc đáo.',
-    buttonText: 'ĐẶT LỊCH NGAY',
-    buttonLink: '/bookings'
+    buttonText: 'DỊCH VỤ',
+    buttonLink: '/services'
   },
 ];
 

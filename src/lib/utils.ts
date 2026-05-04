@@ -27,7 +27,7 @@ export const getFullCDNUrl = (path: string | null) => {
 };
 
 export const handleContactFanpage = () => {
-  const pageId = "399429115584397"; // Thay bằng ID Fanpage của bạn
+  const pageId = "101571052030734"; // Thay bằng ID Fanpage của bạn
   const pageUsername = "nails.xanh"; // Thay bằng username (ví dụ: NailsXanh)
 
   // Kiểm tra nếu là thiết bị di động (iOS/Android)
