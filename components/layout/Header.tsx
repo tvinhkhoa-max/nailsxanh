@@ -20,7 +20,7 @@ const Header = () => {
   const navLinks = [
     { name: 'Trang chủ', href: '/' },
     { name: 'Bộ sưu tập', href: '/collections' },
-    { name: 'Nail Quiz AI', href: '/ai-quiz' },
+    // { name: 'Nail Quiz AI', href: '/ai-quiz' },
     { name: 'Tin tức', href: '/news' },
     { name: 'Dịch vụ', href: '/services' },
     { name: 'Liên hệ', href: '/contact' },

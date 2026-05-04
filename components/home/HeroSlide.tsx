@@ -3,17 +3,18 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Sparkles, CalendarDays } from 'lucide-react';
 import Link from 'next/link';
+import { handleContactFanpage } from '@/src/lib/utils'
 
 // Định nghĩa dữ liệu các ảnh cho Slider
 const heroSlides = [
   {
     id: 1,
-    image: '/images/hero/Baymax_2.webp', // Thay bằng đường dẫn ảnh thật của bạn
+    image: '/images/hero/z7789447377240_571fdc28db60d0d9a3c85791f3a21218.jpg', // Thay bằng đường dẫn ảnh thật của bạn
     title: 'Nails<span class="text-[#5E7A5E] italic">Aesthetic</span>',
     subtitle: 'Nghệ thuật<br/>trên đôi tay',
     description: 'Trải nghiệm cá nhân hóa hoàn hảo với công nghệ AI và AR',
     buttonText: 'KHÁM PHÁ AI QUIZ',
-    buttonLink: '/ai-quiz'
+    buttonLink: '/collections'
   },
   {
     id: 2,
@@ -104,9 +105,9 @@ export default function HeroSlide() {
               <Link href={currentData.buttonLink} className="flex items-center justify-center gap-3 bg-[#2D3A2D] text-white px-8 py-4 rounded-full text-sm font-semibold tracking-widest hover:bg-[#5E7A5E] transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-green-900/10">
                 <CalendarDays size={18}/> {currentData.buttonText}
               </Link>
-              <Link href={currentData.buttonLink} className="flex items-center justify-center gap-3 border border-[#5E7A5E] text-[#5E7A5E] px-8 py-4 rounded-full text-sm hover:bg-white transition-all">
+              <button onClick={handleContactFanpage} className="flex items-center justify-center gap-3 border border-[#5E7A5E] text-[#5E7A5E] px-8 py-4 rounded-full text-sm hover:bg-white transition-all">
                 <Sparkles size={18}/> TƯ VẤN NHANH
-              </Link>
+              </button>
             </div>
           </motion.div>
         </AnimatePresence>

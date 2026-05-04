@@ -1,97 +1,138 @@
 "use client"
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import CollectionGrid from '@/components/collections/CollectionGrid';
 import FilterBar from '@/components/collections/FilterBar';
 import FloatingContact from '@/components/ui/FloatingContact';
 import AIQuizSection from '@/components/home/AIQuizSection';
 
-
 export default function CollectionsClient({ searchParams }: { searchParams: any }) {
-  const [categories, setCategories] = useState([]);
-  const [collections, setCollections] = useState([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [collections, setCollections] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-
-  // Lấy category từ URL (ví dụ: ?category=Natural)
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 12;
   const activeCategory = searchParams?.category || searchParams?.q || 'All';
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  // Lấy category từ URL (ví dụ: ?category=Natural)
-  // const activeCategory = searchParams?.category || 'All';
-
+  // 1. Lấy Categories - Chỉ chạy 1 lần duy nhất
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    const fetchCategories = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-        
-        // Gọi song song cả 2 API
-        const [resCats, resCols] = await Promise.all([
-          fetch(`${baseUrl}/api/v1/nails/cates`),
-          fetch(`${baseUrl}/api/v1/nails/collections${activeCategory && activeCategory != 'All' ? '/search?category=' + activeCategory : ''}`)
-        ]);
-
-        const catsData = await resCats.json();
-        const colsData = await resCols.json() || [];
-
-        setCategories(catsData.data || catsData);
-        setCollections(colsData.data || colsData);
+        const res = await fetch(`${baseUrl}/api/v1/nails/cates`);
+        const catsData = await res.json();
+        setCategories(catsData?.data || catsData);
       } catch (error) {
-        console.error("Lỗi gọi API:", error);
+        console.error("Error Categories:", error);
+      }
+    };
+    fetchCategories();
+  }, [baseUrl]);
+
+  /**
+   * 2. Hàm Fetch dữ liệu Core
+   * Tách biệt logic gọi API để dùng cho cả 2 trường hợp
+   */
+  const getCollectionsData = async (cat: string, targetPage: number) => {
+    const colPath = cat !== 'All' 
+      ? `${baseUrl}/api/v1/nails/collections/search?category=${cat}&page=${targetPage}&limit=${limit}`
+      : `${baseUrl}/api/v1/nails/collections?page=${targetPage}&limit=${limit}`;
+    
+    const res = await fetch(colPath);
+    const result = await res.json();
+    return result.data || result;
+  };
+
+  // 3. Khi activeCategory thay đổi -> RESET toàn bộ
+  useEffect(() => {
+    const initLoad = async () => {
+      setLoading(true);
+      setHasMore(true);
+      setPage(1); // Reset page về 1
+      
+      try {
+        const data = await getCollectionsData(activeCategory, 1);
+        setCollections(data || []);
+        
+        // Nếu trang đầu tiên trả về ít hơn 12 mẫu thì không còn trang sau
+        if (!data || data.length < 12) setHasMore(false);
+      } catch (error) {
+        console.error("Error Initial Load:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [activeCategory]); // Chạy lại mỗi khi category trên URL thay đổi
+    initLoad();
+  }, [activeCategory, baseUrl]); 
+
+  // 4. Hàm Load More - Chỉ NỐI mảng, không RESET
+  const handleLoadMore = useCallback(async () => {
+    // Chặn nếu đang load hoặc đã hết dữ liệu
+    if (loadingMore || !hasMore || loading) return;
+    
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    
+    try {
+      const newData = await getCollectionsData(activeCategory, nextPage);
+
+      if (newData && newData.length > 0) {
+        setCollections((prev) => {
+          // Lọc bỏ trùng lặp ID (phòng trường hợp DB/API trả về trùng)
+          const combined = [...prev, ...newData];
+          return combined.filter((item, index, self) => 
+            index === self.findIndex((t) => t.id === item.id)
+          );
+        });
+        setPage(nextPage);
+        
+        if (newData.length < 12) setHasMore(false);
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Error load more:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [activeCategory, page, hasMore, loadingMore, loading, baseUrl]);
 
   return (
     <>
-    <div className="bg-[#F9FBF9] min-h-screen pt-32 pb-20">
-      <div className="max-w-7xl mx-auto px-6">
-        
-        {/* Header của trang */}
-        <header className="text-center mb-16">
-          <motion.span 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-[#5E7A5E] font-medium tracking-[0.3em] uppercase text-xs"
-          >
-            Curated Series
-          </motion.span>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-serif mt-4 text-[#2D3A2D]"
-          >
-            Bộ Sưu Tập <span className="italic">Nghệ Thuật</span>
-          </motion.h1>
-          <div className="w-20 h-[1px] bg-[#5E7A5E] mx-auto mt-8 opacity-30" />
-        </header>
+      <div className="bg-[#F9FBF9] min-h-screen pt-32 pb-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <header className="text-center mb-16">
+            <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#5E7A5E] font-medium tracking-[0.3em] uppercase text-xs">
+              Curated Series
+            </motion.span>
+            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-5xl md:text-6xl font-serif mt-4 text-[#2D3A2D]">
+              Bộ Sưu Tập <span className="italic">Nghệ Thuật</span>
+            </motion.h1>
+            <div className="w-20 h-[1px] bg-[#5E7A5E] mx-auto mt-8 opacity-30" />
+          </header>
 
-        {/* Thanh lọc Category */}
-        <FilterBar 
-          categories={categories} 
-          active={activeCategory} 
-        />
+          <FilterBar categories={categories} active={activeCategory} />
 
-        {/* Grid hiển thị sản phẩm */}
-        {loading ? (
-          <div className="flex justify-center items-center h-64 text-[#5E7A5E] italic">
-            Đang tìm những mẫu móng đẹp nhất...
-          </div>
-        ) : (
-          <>
-            <CollectionGrid collections={collections} />
-          </>
-        )}
+          {loading ? (
+            <div className="flex justify-center items-center h-64 text-[#5E7A5E] italic">
+              Đang tìm những mẫu móng đẹp nhất...
+            </div>
+          ) : (
+            <CollectionGrid
+              collections={collections}
+              onLoadMore={handleLoadMore}
+              hasMore={hasMore}
+              isLoadingMore={loadingMore}
+            />
+          )}
+        </div>
       </div>
-    </div>
-
-    <FloatingContact />
-
-    <AIQuizSection />
+      <FloatingContact />
+      <AIQuizSection />
     </>
   );
 }

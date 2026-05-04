@@ -23,9 +23,9 @@ export default function Location() {
 
             <div className="space-y-6">
               {[
-                { icon: <MapPin size={20}/>, title: 'Địa chỉ', content: '123 Đường Xanh, Quận 1, TP. Hồ Chí Minh' },
-                { icon: <Phone size={20}/>, title: 'Hotline', content: '090 123 4567' },
-                { icon: <Clock size={20}/>, title: 'Giờ mở cửa', content: 'Thứ 2 - Chủ Nhật | 09:00 AM - 09:00 PM' },
+                { icon: <MapPin size={20}/>, title: 'Địa chỉ', content: '562/23/15 Lê Quang Định . Phường Hạnh Thông, TP. Hồ Chí Minh, Việt Nam' },
+                { icon: <Phone size={20}/>, title: 'Hotline', content: '0985.955.309' },
+                { icon: <Clock size={20}/>, title: 'Giờ mở cửa', content: 'Thứ 2 - Chủ Nhật | 09:00 AM - 08:00 PM' },
               ].map((item, index) => (
                 <div key={index} className="flex gap-5 items-start">
                   <div className="mt-1 text-[#5E7A5E]">{item.icon}</div>
@@ -46,12 +46,13 @@ export default function Location() {
             className="h-[450px] rounded-[32px] overflow-hidden shadow-2xl border-[10px] border-[#F0F5F0]"
           >
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.424167441113!2d106.6991629!3d10.7756587!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f47380e3943%3A0x633e981e1e6b0f1a!2zRGluaCDEkOG7mWMgTOG6rXA!5e0!3m2!1svi!2s!4v1713600000000!5m2!1svi!2s" 
+              src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3918.918!2d106.686871!3d10.816924!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTDCsDQ5JzAwLjkiTiAxMDbCsDQxJzIyLjAiRQ!5e0!3m2!1svi!2s!4v1714900000000!5m2!1svi!2s" 
               width="100%" 
               height="100%" 
               style={{ border: 0, filter: 'grayscale(0.2) contrast(1.1)' }} 
               allowFullScreen 
               loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
             />
           </motion.div>
         </div>

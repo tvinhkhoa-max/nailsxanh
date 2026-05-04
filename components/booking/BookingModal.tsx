@@ -3,10 +3,25 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, User, ChevronDown, Phone } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { sendBooking } from '@/app/actions/sendBooking';
+import { useBooking } from '@/src/context/BookingContext';
 
 export default function BookingModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const { selectedServiceId, setSelectedServiceId } = useBooking();
+
+  // Hook useQuery sẽ quản lý việc gọi API và Caching
+  const { data: services, isLoading, isError } = useQuery({
+    queryKey: ['nail-services'], // Khóa định danh duy nhất cho cache
+    queryFn: async () => {
+      const serviceRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/services`)
+      const serviceData = await serviceRes.json();
+      return serviceData?.data || []
+    },
+    staleTime: 1000 * 60 * 0.5, // Cache 10 phút
+    enabled: isOpen, // CHỈ gọi API khi Modal được mở (Rất quan trọng!)
+  })
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setStatus('loading');
@@ -84,6 +99,24 @@ export default function BookingModal({ isOpen, onClose }: { isOpen: boolean, onC
                     </div>
                   </div>
 
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase font-bold text-gray-400 ml-2">Gói dịch vụ</label>
+                    <div className="relative">
+                      <select
+                        value={selectedServiceId || ''}
+                        onChange={(e) => setSelectedServiceId(e.target.value)}
+                        className="w-full pl-12 pr-10 py-4 bg-[#F9FBF9] rounded-2xl text-sm outline-none border border-transparent focus:border-[#5E7A5E] appearance-none cursor-pointer"
+                      >
+                        {services?.map((item: any) => (
+                          <option key={item.id} value={item.id}>
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                    </div>
+                  </div>
+
                   {/* Ngày & Giờ (Chia 2 cột) */}
                   <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
@@ -102,6 +135,8 @@ export default function BookingModal({ isOpen, onClose }: { isOpen: boolean, onC
                                   <option>10:30 AM</option>
                                   <option>02:00 PM</option>
                                   <option>04:30 PM</option>
+                                  <option>06:00 PM</option>
+                                  <option>07:30 PM</option>
                               </select>
                               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
                           </div>

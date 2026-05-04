@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/cdn/:path*',
+        destination: 'https://nailsxanh-app.onrender.com/cdn/:path*', 
+      },
+    ]
+  },
   /* config options here */
   distDir: '.build',
   productionBrowserSourceMaps: false,
@@ -11,6 +19,11 @@ const nextConfig: NextConfig = {
         hostname: 'localhost',
         port: '3333', // Port của AdonisJS
         pathname: '/**', // Cho phép tất cả các đường dẫn ảnh
+      },
+      {
+        protocol: 'https',
+        hostname: 'grqrkhinsmodinpufglv.supabase.co',
+        pathname: '/storage/v1/object/public/**',
       },
       // Nếu sau này bạn deploy lên server thật, hãy thêm domain đó vào đây
     ],

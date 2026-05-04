@@ -1,6 +1,6 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { BookingProvider } from '@/src/context/BookingContext';
+import Providers from '@/app/providers';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -8,7 +8,7 @@ interface LayoutProps {
 
 export default function MainLayout({ children }: LayoutProps) {
   return (
-    <BookingProvider>
+    <Providers>
       <div className="flex flex-col min-h-screen">
         <Header />
         
@@ -21,6 +21,6 @@ export default function MainLayout({ children }: LayoutProps) {
           
         <Footer />
       </div>
-    </BookingProvider>
+    </Providers>
   );
 }

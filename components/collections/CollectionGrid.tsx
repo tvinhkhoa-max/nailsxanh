@@ -17,55 +17,87 @@ interface CollectionProps {
 
 interface CollectionGridProps {
   collections: CollectionProps[],
+  onLoadMore: any,
+  hasMore: any, 
+  isLoadingMore: any
 }
 
-export default function CollectionGrid({ collections }: CollectionGridProps) {
-  const initialCollections = collections;
-  const [activeTab, setActiveTab] = useState('all');
+export default function CollectionGrid({ collections, onLoadMore, hasMore, isLoadingMore }: CollectionGridProps) {
+  // const initialCollections = collections;
+  // const [activeTab, setActiveTab] = useState('all');
   
-  // Quản lý dữ liệu hiển thị và trạng thái tải thêm
-  const [displayItems, setDisplayItems] = useState(initialCollections.slice(0, 8)); // Load 8 cái đầu tiên
-  const [hasMore, setHasMore] = useState(initialCollections.length > 8);
-  const [isLoading, setIsLoading] = useState(false);
+  // // Quản lý dữ liệu hiển thị và trạng thái tải thêm
+  // const [displayItems, setDisplayItems] = useState(initialCollections.slice(0, 8)); // Load 8 cái đầu tiên
+  // const [isLoading, setIsLoading] = useState(false);
   
-  // Ref để theo dõi điểm cuối danh sách
-  const loadMoreRef = useRef(null);
+  // // Ref để theo dõi điểm cuối danh sách
+  // const loadMoreRef = useRef(null);
+
+  // // Ref này để đánh dấu điểm cuối của danh sách
+  // const observerTarget = useRef(null);
 
   // Logic load thêm dữ liệu
-  const loadMoreItems = () => {
-    if (isLoading || !hasMore) return;
+  // const loadMoreItems = () => {
+  //   if (isLoading || !hasMore) return;
     
-    setIsLoading(true);
-    // Giả lập delay mạng 1s
-    setTimeout(() => {
-      const currentLength = displayItems.length;
-      const nextItems = initialCollections.slice(currentLength, currentLength + 4); // Mỗi lần load thêm 4
+  //   setIsLoading(true);
+
+  //   // Giả lập delay mạng 1s
+  //   setTimeout(() => {
+  //     const currentLength = displayItems.length;
+  //     const nextItems = initialCollections.slice(currentLength, currentLength + 4); // Mỗi lần load thêm 4
       
-      setDisplayItems(prev => [...prev, ...nextItems]);
-      if (currentLength + 4 >= initialCollections.length) setHasMore(false);
-      setIsLoading(false);
-    }, 800);
-  };
+  //     setDisplayItems(prev => [...prev, ...nextItems]);
+
+  //     if (currentLength + 4 >= initialCollections.length) setHasMore(false);
+  //     setIsLoading(false);
+  //   }, 800);
+  // };
 
   // Intersection Observer: Theo dõi khi khách cuộn đến cuối
+  // useEffect(() => {
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       if (entries[0].isIntersecting && hasMore && !isLoading) {
+  //         loadMoreItems();
+  //       }
+  //     },
+  //     { threshold: 1.0 }
+  //   );
+
+  //   if (observerTarget.current) {
+  //     observer.observe(observerTarget.current);
+  //   }
+
+  //   // if (loadMoreRef.current) {
+  //   //   observer.observe(loadMoreRef.current);
+  //   // }
+
+  //   // return () => observer.disconnect();
+  //   return () => {
+  //     if (observerTarget.current) observer.unobserve(observerTarget.current);
+  //   };
+
+  // }, [hasMore, displayItems, isLoading]);
+
+  // Lọc dữ liệu theo Tab (vẫn giữ logic filter của bạn)
+  // const filteredData = activeTab === 'all' 
+  //   ? displayItems 
+  //   : displayItems.filter(item => item.cate === activeTab);
+  const observerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          loadMoreItems();
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+          onLoadMore();
         }
       },
-      { threshold: 1.0 }
+      { threshold: 0.1, rootMargin: '200px' } 
     );
 
-    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+    if (observerRef.current) observer.observe(observerRef.current);
     return () => observer.disconnect();
-  }, [hasMore, displayItems, isLoading]);
-
-  // Lọc dữ liệu theo Tab (vẫn giữ logic filter của bạn)
-  const filteredData = activeTab === 'all' 
-    ? displayItems 
-    : displayItems.filter(item => item.cate === activeTab);
+  }, [onLoadMore, hasMore, isLoadingMore]);
 
   return (
     <section className="bg-[#F9FBF9] py-10 px-4 md:px-10">
@@ -74,10 +106,10 @@ export default function CollectionGrid({ collections }: CollectionGridProps) {
       {/* GALLERY WALL WITH MASONRY */}
       <div className="columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6 max-w-7xl mx-auto">
         <AnimatePresence mode='popLayout'>
-          {filteredData.map((item) => (
+          {collections.map((item: any, index: number) => (
             <motion.div
               layout
-              key={item.id}
+              key={index}
               className="break-inside-avoid group relative"
             >
               <div className="relative bg-white rounded-[32px] overflow-hidden shadow-sm border border-gray-50">
@@ -125,15 +157,17 @@ export default function CollectionGrid({ collections }: CollectionGridProps) {
       </div>
 
       {/* ĐIỂM CHỐT ĐỂ LOAD THÊM (LOADER) */}
-      <div ref={loadMoreRef} className="py-20 flex justify-center items-center">
-        {isLoading ? (
+      <div ref={observerRef} className="py-20 flex justify-center items-center">
+        {isLoadingMore ? (
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="animate-spin text-[#5E7A5E]" size={32} />
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Đang lấy thêm cảm hứng...</p>
           </div>
-        ) : !hasMore && displayItems.length > 0 ? (
+        ) : hasMore ? (
+          <div className="h-10" /> // Khoảng trống để observer bắt được
+        ) : (
           <p className="text-gray-300 font-serif italic">Bạn đã xem hết bộ sưu tập hiện có</p>
-        ) : null}
+        )}
       </div>
     </section>
   );

@@ -1,29 +1,66 @@
 "use client"
-import { motion } from 'framer-motion';
+import Image from 'next/image'
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, ChevronRight } from 'lucide-react';
+import { getFullStaticImageUrl } from '@/src/lib/utils'
 
-const items = [
-  { id: 1, img: '/images/nails/elegant_white_nail.webp', title: 'Elegant White', size: 'h-[400px]' },
-  { id: 2, img: '/images/nails/deep_forest_nail.webp', title: 'Deep Forest', size: 'h-[500px]' },
-  { id: 3, img: '/images/nails/minimalist_line.webp', title: 'Minimalist Line', size: 'h-[350px]' },
-  { id: 4, img: '/images/nails/nude_pearl.webp', title: 'Nude Pearl', size: 'h-[450px]' },
-];
+interface Props {
+  collections: any[]
+}
 
-const CollectionMasonry = () => {
+const CollectionMasonry = ({ collections }: Props) => {
+  console.log(collections)
   return (
-    <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-      {items.map((item) => (
-        <motion.div 
-          key={item.id}
-          whileHover={{ y: -10 }}
-          className={`relative break-inside-avoid overflow-hidden rounded-2xl group cursor-pointer ${item.size}`}
-        >
-          <img src={item.img} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-            <p className="text-white font-serif text-xl">{item.title}</p>
-          </div>
-        </motion.div>
-      ))}
-    </div>
+    <section className="bg-[#F9FBF9] py-10 px-4 md:px-10">
+      {/* ... (Phần Filter Chips giữ nguyên như cũ) ... */}
+
+      {/* GALLERY WALL WITH MASONRY */}
+      <div className="columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6 max-w-7xl mx-auto">
+        <AnimatePresence mode='popLayout'>
+          {collections.map((item: any, index: number) => (
+            <motion.div
+              layout
+              key={index}
+              className="break-inside-avoid group relative"
+            >
+              <div className="relative bg-white rounded-[32px] overflow-hidden shadow-sm border border-gray-50">
+                
+                {/* LAZY LOAD IMAGE: Dùng thuộc tính loading="lazy" mặc định của trình duyệt */}
+                <img 
+                  src={getFullStaticImageUrl(item.img)} 
+                  loading="lazy" 
+                  alt={item.name}
+                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+
+                {/* Overlay Buttons (Chỉ hiện khi hover) */}
+                <div className="absolute inset-0 bg-[#2D3A2D]/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-3 p-4">
+                  <button className="w-full max-w-[160px] bg-white text-[#2D3A2D] py-3 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 hover:bg-[#5E7A5E] hover:text-white transition-colors"
+                  >
+                    <Sparkles size={14} /> <Link href={`/try-on?collection=${item.tag}`}>THỬ AR NGAY</Link>
+                  </button>
+                </div>
+
+                {/* Info Bar (Luôn hiển thị nhẹ nhàng ở dưới) */}
+                <div className="p-5 bg-gradient-to-t from-white via-white to-transparent">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-sm font-serif text-[#2D3A2D] font-bold tracking-tight">
+                        {item.name}
+                      </h3>
+                      {/* <p className="text-[9px] text-[#5E7A5E] font-bold uppercase mt-1 tracking-widest">
+                        {item.cate || 'Exclusive'}
+                      </p> */}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </section>
   );
 };
 

@@ -179,3 +179,9 @@ img, video {
 .nextjs-portal {
   display: none !important;
 }
+
+/* Thêm vào file globals.css */
+img:not([src]), 
+img[src=""] {
+  opacity: 0;
+}
