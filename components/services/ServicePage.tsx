@@ -54,7 +54,7 @@ export default function ServicesSection({ services }: Props) {
         {serviceCategories.map((cat, idx) => (
           <div key={idx} className="mb-16">
             <h2 className="text-2xl font-serif text-[#5E7A5E] border-b border-[#E8F1E8] pb-4 mb-8 uppercase tracking-widest text-sm font-bold">
-              {cat.name}
+              {cat.title}
             </h2>
             <div className="grid gap-6">
               {cat.items.map((item: any, i: number) => (

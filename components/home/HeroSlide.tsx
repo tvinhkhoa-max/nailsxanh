@@ -113,7 +113,8 @@ export default function HeroSlide() {
         </AnimatePresence>
 
         {/* Cột Phải: Slider Ảnh - Chuyển động Fade & Scale */}
-        <div className="relative h-[450px] md:h-[600px] w-full group">
+        <div className="relative h-[380px] md:h-[600px] w-full group">
+        {/* <div className="relative w-full group"> */}
           <AnimatePresence mode="wait">
             <motion.div 
               key={currentSlide + '-img'}
@@ -123,7 +124,13 @@ export default function HeroSlide() {
               transition={{ duration: 1.2, ease: "circOut" }}
               className="absolute inset-0 bg-cover bg-center rounded-[32px] md:rounded-[40px] shadow-2xl border-[8px] md:border-[12px] border-white cursor-pointer overflow-hidden"
               style={{ backgroundImage: `url(${currentData.image})` }}
-            />
+            >
+            {/* <img 
+              src={currentData.image}
+              alt="Hero" 
+              className="w-full h-full object-contain" // object-contain sẽ giúp hiện toàn bộ ảnh
+            /> */}
+            </motion.div>
           </AnimatePresence>
 
           {/* Các nút điều hướng ẩn hiện khi hover vào vùng ảnh */}

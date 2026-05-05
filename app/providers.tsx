@@ -4,6 +4,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { BookingProvider } from '@/src/context/BookingContext';
+import { DeviceProvider } from '@/src/context/DeviceContext';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -18,9 +19,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BookingProvider>
-        {children}
-      </BookingProvider>
+      <DeviceProvider>
+        <BookingProvider>
+          {children}
+        </BookingProvider>
+      </DeviceProvider>
     </QueryClientProvider>
   )
 }

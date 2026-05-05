@@ -6,7 +6,7 @@ import { MessageCircle, X } from 'lucide-react';
 import Image from 'next/image';
 
 const channels = [
-  { name: 'Zalo', color: '#0068FF', icon: '/icons/zalo.png', link: 'https://zalo.me/0901234567' },
+  { name: 'Zalo', color: '#0068FF', icon: '/icons/zalo.png', link: 'https://zalo.me/0388128312' },
   { name: 'Messenger', color: '#0084FF', icon: '/icons/messenger.png', link: 'https://m.me/nails.xanh' },
   { name: 'WhatsApp', color: '#25D366', icon: '/icons/whatsapp.png', link: 'https://wa.me/84901234567' },
 ];

@@ -2,10 +2,13 @@
 "use client"
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Sparkles, MessageCircle, Loader2, ChevronRight } from 'lucide-react';
-import { getFullStaticImageUrl } from '@/src/lib/utils'
+import { getFullStaticImageUrl } from '@/src/lib/utils';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useBooking } from '@/src/context/BookingContext';
 
 interface CollectionProps {
   id: string
@@ -85,6 +88,10 @@ export default function CollectionGrid({ collections, onLoadMore, hasMore, isLoa
   //   ? displayItems 
   //   : displayItems.filter(item => item.cate === activeTab);
   const observerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const router = useRouter();
+  const { openBooking } = useBooking();
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -99,6 +106,10 @@ export default function CollectionGrid({ collections, onLoadMore, hasMore, isLoa
     return () => observer.disconnect();
   }, [onLoadMore, hasMore, isLoadingMore]);
 
+  const handleNavigate = (tag: string) => {
+    router.push(`/try-on?collection=${tag}`);
+  };
+
   return (
     <section className="bg-[#F9FBF9] py-10 px-4 md:px-10">
       {/* ... (Phần Filter Chips giữ nguyên như cũ) ... */}
@@ -110,7 +121,13 @@ export default function CollectionGrid({ collections, onLoadMore, hasMore, isLoa
             <motion.div
               layout
               key={index}
-              className="break-inside-avoid group relative"
+              className="break-inside-avoid group relative cursor-pointer"
+              // Xử lý riêng cho Mobile: Chạm vào là mở AR ngay
+              onClick={() => {
+                if (isMobile) { // window.innerWidth < 768
+                  handleNavigate(item.tag);
+                }
+              }}
             >
               <div className="relative bg-white rounded-[32px] overflow-hidden shadow-sm border border-gray-50">
                 
@@ -129,8 +146,10 @@ export default function CollectionGrid({ collections, onLoadMore, hasMore, isLoa
                     <Sparkles size={14} /> <Link href={`/try-on?collection=${item.tag}`}>THỬ AR NGAY</Link>
                   </button>
                   
-                  <button className="w-full max-w-[160px] bg-black/30 backdrop-blur-md text-white py-3 rounded-xl text-[10px] font-black border border-white/20 flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-colors">
-                    <MessageCircle size={14} /> TƯ VẤN AI
+                  <button
+                    onClick={() => openBooking('3')}
+                    className="w-full max-w-[160px] bg-black/30 backdrop-blur-md text-white py-3 rounded-xl text-[10px] font-black border border-white/20 flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-colors">
+                    <MessageCircle size={14} /> ĐẶT LỊCH HẸN
                   </button>
                 </div>
 

@@ -27,23 +27,33 @@ export const getFullCDNUrl = (path: string | null) => {
 };
 
 export const handleContactFanpage = () => {
-  const pageId = "101571052030734"; // Thay bằng ID Fanpage của bạn
-  const pageUsername = "nails.xanh"; // Thay bằng username (ví dụ: NailsXanh)
-
-  // Kiểm tra nếu là thiết bị di động (iOS/Android)
+  const pageId = "101571052030734";
+  const pageUsername = "nails.xanh";
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   if (isMobile) {
-    // Mở trực tiếp ứng dụng Messenger bằng Deep Link
-    // Cấu trúc: fb-messenger://user-thread/{page_id}
-    window.location.href = `fb-messenger://user-thread/${pageId}`;
+    const messengerAppUrl = `fb-messenger://user-thread/${pageId}`;
+    const messengerWebUrl = `https://m.me/${pageUsername}`;
     
-    // Fallback: Nếu không có app Messenger, sau 500ms chuyển hướng đến link web
-    setTimeout(() => {
-      window.location.href = `https://m.me/${pageUsername}`;
-    }, 500);
+    // 1. Cố gắng mở App
+    window.location.href = messengerAppUrl;
+
+    // 2. Thiết lập một Timer để chuyển sang Web nếu không mở được App
+    const fallbackTimer = setTimeout(() => {
+      window.location.href = messengerWebUrl;
+    }, 3000); // Tăng lên 1.5s để đủ thời gian cho App khởi động
+
+    // 3. Lắng nghe nếu trình duyệt bị đẩy xuống chạy ngầm (App đã mở thành công)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        // Nếu trình duyệt đã ẩn đi, nghĩa là App đã mở -> Hủy lệnh chuyển web
+        clearTimeout(fallbackTimer);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
   } else {
-    // Trên PC: Mở trang Facebook Fanpage
     window.open(`https://www.facebook.com/${pageUsername}`, '_blank');
   }
 };

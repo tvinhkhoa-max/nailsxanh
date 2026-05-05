@@ -95,11 +95,11 @@ export async function sendBooking(formDataInput: any) {
     phone,
     date,
     time,
+    service,
     message: message
   }
 
   // THAY ĐỔI Ở ĐÂY: Dùng tham số "group" thay cho "phone"
-  // const url = `https://api.callmebot.com/whatsapp.php?group=${GROUP_ID}&text=${encodeURIComponent(message)}&apikey=${API_KEY}`;
   const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/bookings/reserve`;
   try {
     const res = await fetch(url, { 

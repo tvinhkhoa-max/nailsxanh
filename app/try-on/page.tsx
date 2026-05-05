@@ -7,10 +7,12 @@ import { useSearchParams } from 'next/navigation';
 import ARSection from '@/components/ai/ARSection';
 import ARContainer from '@/components/ai/ARContainer';
 import { useBooking } from '@/src/context/BookingContext'; // Import hook
+import { useDevice } from '@/src/context/DeviceContext';
 
 function TryOnContent() {
   const searchParams = useSearchParams();
   const { openBooking } = useBooking();
+  const { isMobile } = useDevice();
   const [selectedCollection, setSelectedCollection] = useState<string>(searchParams.get('collection') || '');
   const [fingerNails, setFingerNails] = useState<Record<number, string>>({ 4: "", 8: "", 12: "", 16: "", 20: "" });
   const [activeFinger, setActiveFinger] = useState<number>(4);
@@ -61,6 +63,7 @@ function TryOnContent() {
           selectedCollection={selectedCollection}
           setSelectedCollection={setSelectedCollection}
           loading={loading}
+          isMobile
         />
       </ARContainer>
 

@@ -67,7 +67,7 @@ export default function Home() {
 
       {/* Giới thiệu tổng quan (Dịch vụ) */}
       <ServiceIntro />
-      
+
       {/* Section giới thiệu bộ sưu tập */}
       <section className="py-24 px-6 md:px-20 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -91,7 +91,6 @@ export default function Home() {
       <Location />
 
       <AIQuizSection />
-
 
       <FloatingContact />
       

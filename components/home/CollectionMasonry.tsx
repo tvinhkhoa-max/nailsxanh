@@ -3,14 +3,20 @@ import Image from 'next/image'
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ChevronRight } from 'lucide-react';
-import { getFullStaticImageUrl } from '@/src/lib/utils'
+import { useRouter } from 'next/navigation';
+import { useDevice } from '@/src/context/DeviceContext';
+import { getFullStaticImageUrl } from '@/src/lib/utils';
 
 interface Props {
   collections: any[]
 }
 
 const CollectionMasonry = ({ collections }: Props) => {
-  console.log(collections)
+  const { isMobile } = useDevice();
+  const router = useRouter();
+  const handleNavigate = (tag: string) => {
+    router.push(`/try-on?collection=${tag}`);
+  };
   return (
     <section className="bg-[#F9FBF9] py-10 px-4 md:px-10">
       {/* ... (Phần Filter Chips giữ nguyên như cũ) ... */}
@@ -23,6 +29,12 @@ const CollectionMasonry = ({ collections }: Props) => {
               layout
               key={index}
               className="break-inside-avoid group relative"
+              // Xử lý riêng cho Mobile: Chạm vào là mở AR ngay
+              onClick={() => {
+                if (isMobile) { // window.innerWidth < 768
+                  handleNavigate(item.tag);
+                }
+              }}
             >
               <div className="relative bg-white rounded-[32px] overflow-hidden shadow-sm border border-gray-50">
                 
