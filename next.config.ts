@@ -1,16 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: '/cdn/:path*',
-        destination: 'https://nailsxanh-app.onrender.com/cdn/:path*', 
-      },
-    ]
-  },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/cdn/:path*',
+  //       destination: 'https://nailsxanh-app.onrender.com/cdn/:path*', 
+  //     },
+  //   ]
+  // },
   /* config options here */
-  distDir: '.build',
+  // distDir: '.build',
   productionBrowserSourceMaps: false,
   images: {
     remotePatterns: [
