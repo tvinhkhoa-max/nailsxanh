@@ -16,13 +16,14 @@ export default function NewsDetail() {
   const [loading, setLoading] = useState(true);
   const [news, setNews] = useState<any>(null);
 
-  const id = params.id as string; console.log(params)
+  const id = params.id as string;
 
   const fetchData = async (Id: string) => {
     setLoading(true);
     try {
       if (Id) {
-        const newsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/news/detail?id=${Id}`);
+        // const newsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/news/detail?id=${Id}`);
+        const newsRes = await fetch(`/api/news/detail?id=${Id}`);
         const newsData = await newsRes.json();
         setNews(newsData?.data || null);
       }
