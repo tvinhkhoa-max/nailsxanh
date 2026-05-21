@@ -50,7 +50,8 @@ export function useHandAR({
     let stream: MediaStream;
     const init = async () => {
       const vision = await FilesetResolver.forVisionTasks(
-        "/wasm/mediapipe" // https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.10/wasm
+        // "/wasm/mediapipe"
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.10/wasm"
       );
 
       // 2. Kiểm tra nếu landmarker đã tồn tại thì đóng trước khi tạo mới
@@ -63,7 +64,8 @@ export function useHandAR({
         {
           baseOptions: {
             modelAssetPath:
-              "/assets/cdn/hand_landmarker.task",
+              // "/assets/cdn/hand_landmarker.task",
+              "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
             delegate: "GPU",
           },
           runningMode: "VIDEO",

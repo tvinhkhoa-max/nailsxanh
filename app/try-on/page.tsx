@@ -31,8 +31,9 @@ function TryOnContent() {
 
         // Gọi song song
         const res = await fetch(
-          `${baseUrl}/api/v1/nails/models?collection=${selectedCollection}`
-        );
+          // `${baseUrl}/api/v1/nails/models?collection=${selectedCollection}`
+          `/api/nails/models?collection=${selectedCollection}`
+        ) as any;
 
         const data = await res.json();
 

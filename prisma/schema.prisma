@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model adonis_schema {
+  id             Int       @id @default(autoincrement())
+  name           String    @db.VarChar(255)
+  batch          Int
+  migration_time DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model adonis_schema_versions {
+  version Int @id
+}
+
+model nail_admins {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+}
+
+model nail_bookings {
+  id         Int       @id @default(autoincrement())
+  id_ext     String?   @db.Uuid
+  customer   String?   @db.VarChar(255)
+  phone      String?   @db.VarChar(255)
+  service    String?   @db.VarChar(255)
+  set        String?   @db.VarChar(255)
+  note       String?   @db.VarChar(255)
+  order_at   DateTime? @db.Timestamptz(6)
+  status     Int?      @default(2)
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+}
+
+model nail_cates {
+  id         String    @id @db.Uuid
+  name       String?   @db.VarChar(100)
+  hot        Boolean?  @default(false)
+  tag        String?   @db.VarChar(50)
+  price      Float?    @db.Real
+  desc       String?   @db.VarChar(255)
+  status     Int?      @default(1)
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+
+  collections nail_collections[]
+}
+
+model nail_collections {
+  id         String    @id @db.Uuid
+  name       String?   @db.VarChar(50)
+  cate       String?   @db.Uuid
+
+  relationshipCate    nail_cates? @relation(fields: [cate], references: [id])
+
+  tag        String?   @db.VarChar(50)
+  style      String?   @db.VarChar(50)
+  occasion   String?   @db.VarChar(50)
+  color      String?   @db.VarChar(20)
+  desc       String?   @db.VarChar(255)
+  img        String?   @db.VarChar(255)
+  status     Int?      @default(1)
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+  hot        Boolean?
+  nailObjs       nail_nails[]
+}
+
+model nail_customers {
+  id         Int       @id @default(autoincrement())
+  name       String?   @db.VarChar(50)
+  sex        String?   @db.VarChar(5)
+  phone      String?   @db.VarChar(20)
+  email      String?   @db.VarChar(20)
+  password   String?   @db.VarChar(50)
+  avatar     String?   @db.VarChar(255)
+  status     Int?      @default(1)
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+}
+
+model nail_nails {
+  id         String    @id @db.Uuid
+  name       String?   @db.VarChar(255)
+  cate       String?   @db.Uuid
+  img        String?   @db.VarChar(255)
+  status     Int?
+
+  relationshipCollection nail_collections? @relation(fields: [collection], references: [id])
+
+  collection String?   @db.Uuid
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+}
+
+model nail_news {
+  id         String    @id @db.Uuid
+  title      String?   @db.VarChar(255)
+  cate       String?   @db.VarChar(50)
+  tag        String?   @db.VarChar(255)
+  desc       String?
+  img        String?   @db.VarChar(255)
+  hot        Boolean?
+  status     Int?      @default(1)
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+  source     String?   @db.VarChar(100)
+}
+
+model nail_orders {
+  id            Int       @id @default(autoincrement())
+  preview_image String?   @db.VarChar(255)
+  customer_name String?   @db.VarChar(50)
+  phone         String?   @db.VarChar(12)
+  nail_id       Int?
+  status        Int?      @default(1)
+  created_at    DateTime? @db.Timestamptz(6)
+  updated_at    DateTime? @db.Timestamptz(6)
+}
+
+model nail_services {
+  id         Int       @id @default(autoincrement())
+  name       String?   @db.VarChar(255)
+  type       String?   @db.VarChar(255)
+  tenant     String?   @db.VarChar(255)
+  desc       String?
+  status     Int?
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+  duration   String?   @db.VarChar(5)
+  price      String?   @db.VarChar(50)
+}
+
+model nail_tenants {
+  id         Int       @id @default(autoincrement())
+  name       String?   @db.VarChar(50)
+  domain     String?   @db.VarChar(50)
+  plan       String?   @db.VarChar(50)
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+}

@@ -28,16 +28,31 @@ const Header = () => {
 
   return (
     <header className={`fixed top-0 w-full z-[100] transition-all duration-500 ${
-      scrolled ? 'bg-white/80 backdrop-blur-md py-4 shadow-sm' : 'bg-transparent py-6'
+      scrolled ? 'bg-white/80 backdrop-blur-md py-1 shadow-sm' : 'bg-transparent py-2'
     }`}>
-      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center h-full">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-serif font-bold tracking-tighter text-[#2D3A2D]">
-          NAILS<span className="text-[#5E7A5E]">XANH</span>
+        <Link href="/" className="flex items-center -mt-4">
+          <div className="relative h-[80px] w-[180px] md:h-[80px] md:w-[180px]">
+              <img
+                src="/assets/images/logo_nailsxanh.png"
+                alt="Logo Nails Xanh"
+                className="
+                  max-w-[60%] h-auto
+                  absolute inset-0
+                  object-contain object-left
+                  transition-transform duration-1000
+                  hover:rotate-[360deg]"
+                style={{
+                  maxWidth: '60%',
+                  height: 'auto'
+                }}
+              />
+          </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-8 h-full">
           {navLinks.map((link) => (
             <Link 
               key={link.name} 

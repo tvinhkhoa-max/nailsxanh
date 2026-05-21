@@ -23,11 +23,14 @@ export default function Home() {
   const [hasMore, setHasMore] = useState(false);
   const handleLoadMore = (async () => {})
   const getFetchData = async (targetPage: number, limit: number) => {
-    const colPath = `${baseUrl}/api/v1/nails/collections?hot=true&page=${targetPage}&limit=${limit}`;
-    const newsPath = `${baseUrl}/api/v1/news/search?hot=true&page=1&limit=2`;
+    // const colPath = `${baseUrl}/api/v1/nails/collections?hot=true&page=${targetPage}&limit=${limit}`;
+    // const newsPath = `${baseUrl}/api/v1/news/search?hot=true&page=1&limit=2`;
+    const colPath = `/api/collections?hot=true&page=${targetPage}&limit=${limit}`;
+    const newsPath = `/api/news?hot=true&page=1&limit=2`;
     try {
       const [resCol, resNews] = await Promise.all([
-        fetch(colPath), fetch(newsPath)
+        fetch(colPath),
+        fetch(newsPath)
       ]);
       const resultCols = await resCol.json();
       const resultNews = await resNews.json();
@@ -62,7 +65,8 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen">
+    // <main className="min-h-screen">
+    <>
       <HeroSlide />
 
       {/* Giới thiệu tổng quan (Dịch vụ) */}
@@ -97,6 +101,6 @@ export default function Home() {
       {/* <ARFeature /> */}
 
       <Footer />
-    </main>
+    </>
   );
 }

@@ -58,8 +58,7 @@ export default function HeroSlide() {
   const currentData = heroSlides[currentSlide];
 
   return (
-    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#F9FBF9] mt-20 md:mt-0 pt-24 md:pt-0">
-      
+    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#F9FBF9]">
       {/* Background Decor - Mảng màu xanh sage mờ phía sau */}
       <motion.div 
         key={currentSlide + '-bg'}

@@ -17,7 +17,8 @@ export default function NewsPage() {
       // 1. Lấy 3 tin HOT trước nếu là trang 1
       let currentHot = hotNews;
       if (page === 1 && hotNews.length === 0) {
-        const hotRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/news/search?hot=true&limit=3`);
+        // const hotRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/news/search?hot=true&limit=3`);
+        const hotRes = await fetch(`/api/news?hot=true&limit=3`);
         const hotData = await hotRes.json();
         currentHot = hotData?.data || [];
         setHotNews(currentHot);
@@ -25,7 +26,8 @@ export default function NewsPage() {
 
       // 2. Lấy danh sách tin thường (loại trừ ID của tin hot)
       const excludeIds = currentHot.map((item: any) => item.id).join('|');
-      const newsPath = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/news/search?exclude=${excludeIds}&page=${page}&limit=${limit}`;
+      // const newsPath = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/news/search?exclude=${excludeIds}&page=${page}&limit=${limit}`;
+      const newsPath = `/api/news?exclude=${excludeIds}&page=${page}&limit=${limit}`;
       
       const res = await fetch(newsPath);
       const resultNews = await res.json();

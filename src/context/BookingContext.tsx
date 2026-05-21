@@ -32,7 +32,8 @@ export const BookingProvider = ({ children }: { children: React.ReactNode }) => 
   const { data: services = [], isLoading } = useQuery({
     queryKey: ['nail-services'],
     queryFn: async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/services`)
+      // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/services`)
+      const res = await fetch(`/api/services`)
       const json = await res.json()
       return json?.data || []
     },

@@ -22,7 +22,9 @@ export default function CollectionsClient({ searchParams }: { searchParams: any 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${baseUrl}/api/v1/nails/cates`);
+        // const res = await fetch(`${baseUrl}/api/v1/nails/cates`);
+        // setCategories(catsData?.data || catsData);
+        const res = await fetch('/api/categories') as any;
         const catsData = await res.json();
         setCategories(catsData?.data || catsData);
       } catch (error) {
@@ -38,12 +40,14 @@ export default function CollectionsClient({ searchParams }: { searchParams: any 
    */
   const getCollectionsData = async (cat: string, targetPage: number) => {
     const colPath = cat !== 'All' 
-      ? `${baseUrl}/api/v1/nails/collections/search?category=${cat}&page=${targetPage}&limit=${limit}`
-      : `${baseUrl}/api/v1/nails/collections?page=${targetPage}&limit=${limit}`;
+      // ? `${baseUrl}/api/v1/nails/collections/search?category=${cat}&page=${targetPage}&limit=${limit}`
+      // : `${baseUrl}/api/v1/nails/collections?page=${targetPage}&limit=${limit}`;
+      ? `/api/collections?category=${cat}&page=${targetPage}&limit=${limit}`
+      : `/api/collections?page=${targetPage}&limit=${limit}`;
     
-    const res = await fetch(colPath);
+    const res = await fetch(colPath) as any;
     const result = await res.json();
-    return result.data || result;
+    return result?.data || result;
   };
 
   // 3. Khi activeCategory thay đổi -> RESET toàn bộ
@@ -54,7 +58,7 @@ export default function CollectionsClient({ searchParams }: { searchParams: any 
       setPage(1); // Reset page về 1
       
       try {
-        const data = await getCollectionsData(activeCategory, 1);
+        const data = await getCollectionsData(activeCategory, 1); console.log(data);
         setCollections(data || []);
         
         // Nếu trang đầu tiên trả về ít hơn 12 mẫu thì không còn trang sau
