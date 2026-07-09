@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import CollectionGrid from '@/components/collections/CollectionGrid';
 import FilterBar from '@/components/collections/FilterBar';
-import FloatingContact from '@/components/ui/FloatingContact';
+// import FloatingContact from '@/components/ui/FloatingContact';
 import AIQuizSection from '@/components/home/AIQuizSection';
 
 export default function CollectionsClient({ searchParams }: { searchParams: any }) {
@@ -135,7 +135,7 @@ export default function CollectionsClient({ searchParams }: { searchParams: any 
           )}
         </div>
       </div>
-      <FloatingContact />
+      {/* <FloatingContact /> */}
       <AIQuizSection />
     </>
   );

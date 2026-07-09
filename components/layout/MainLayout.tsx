@@ -1,6 +1,7 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Providers from '@/app/providers';
+import FloatingContact from '@/components/ui/FloatingContact';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ export default function MainLayout({ children }: LayoutProps) {
         */}
         <main className="flex-grow pt-20">
           {children}
+          <FloatingContact />
         </main>
           
         <Footer />
