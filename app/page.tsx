@@ -7,7 +7,7 @@ import AIQuizSection from '@/components/home/AIQuizSection';
 import CollectionMasonry from '@/components/home/CollectionMasonry';
 import NailQuiz from '@/components/home/NailQuiz';
 import Location from '@/components/ui/Location';
-import FloatingContact from '@/components/ui/FloatingContact';
+// import FloatingContact from '@/components/ui/FloatingContact';
 import FeaturedNews from '@/components/home/FeaturedNews';
 import ServiceIntro from '@/components/home/ServiceIntro';
 // import CollectionGrid from '@/components/collections/CollectionGrid';
@@ -99,8 +99,8 @@ export default function Home() {
 
       <AIQuizSection />
 
-      <FloatingContact />
-      
+      {/* <FloatingContact /> */}
+
       {/* <ARFeature /> */}
 
       <Footer />
