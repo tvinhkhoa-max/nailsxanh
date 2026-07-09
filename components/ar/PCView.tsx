@@ -1,4 +1,5 @@
 // src/components/ar/PCView.tsx
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, RefreshCw, Save, Sparkles } from 'lucide-react';
 import { getFullStaticImageUrl } from '@/src/lib/utils'

@@ -1,4 +1,5 @@
 // src/components/ar/MobileView.tsx
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { getFullStaticImageUrl } from '@/src/lib/utils'
 import { X } from 'lucide-react';

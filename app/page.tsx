@@ -11,7 +11,8 @@ import FloatingContact from '@/components/ui/FloatingContact';
 import FeaturedNews from '@/components/home/FeaturedNews';
 import ServiceIntro from '@/components/home/ServiceIntro';
 // import CollectionGrid from '@/components/collections/CollectionGrid';
-import MenuSection from '@/components/home/MenuSection'
+import MenuSection from '@/components/home/MenuSection';
+import SaleCountdown from '@/components/home/SaleCountdown';
 import Footer from '@/components/layout/Footer';
 
 export default function Home() {
@@ -68,6 +69,8 @@ export default function Home() {
     // <main className="min-h-screen">
     <>
       <HeroSlide />
+
+      <SaleCountdown />
 
       {/* Giới thiệu tổng quan (Dịch vụ) */}
       <ServiceIntro />
