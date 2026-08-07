@@ -34,7 +34,7 @@ export default function SaleCountdown() {
               Flash Sale
             </span>
             <span className="font-medium text-sm md:text-base">
-              Ưu đãi: Giảm <span className="font-extrabold text-amber-200">20%</span> khi đặt lịch hôm nay!
+              Ưu đãi: Combo Úp móng, sơn gel chỉ <span className="font-extrabold text-amber-200">189.000</span> khi đặt lịch!
             </span>
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function SaleCountdown() {
               whileTap={{ scale: 0.95 }}
               className="bg-white text-pink-600 hover:bg-pink-50 px-4 py-1.5 rounded-full text-sm font-bold shadow-sm flex items-center gap-1 transition-all"
             >
-              Thử móng ngay <ArrowRight className="w-4 h-4" />
+              {/* Thử móng ngay <ArrowRight className="w-4 h-4" /> */}
             </motion.button>
           </Link>
         </div>

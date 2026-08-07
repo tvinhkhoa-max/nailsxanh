@@ -23,7 +23,7 @@ const Header = () => {
     // { name: 'Nail Quiz AI', href: '/ai-quiz' },
     { name: 'Tin tức', href: '/news' },
     { name: 'Dịch vụ', href: '/services' },
-    { name: 'Liên hệ', href: '/contact' },
+    { name: 'Voucher', href: '/voucher' },
   ];
 
   return (

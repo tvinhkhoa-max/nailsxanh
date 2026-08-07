@@ -8,7 +8,11 @@ const MenuSection = () => {
           <h2 className="text-4xl md:text-5xl font-serif mb-4 text-charcoal">Dịch vụ của Nails Xanh</h2>
         </div>
         <div className="flex justify-center">
-          <img src="/assets/images/menu_nailsxanh_v1.jpg" />
+          <img src="/assets/images/menu_nailsxanh_v2.jpg" />
+        </div>
+        <br />
+        <div className="flex justify-center">
+          <img src="/assets/images/menu_nailsxanh_services_v2.jpg" />
         </div>
       </div>
     </section>
