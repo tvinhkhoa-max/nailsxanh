@@ -3,9 +3,21 @@ import { NextRequest, NextResponse } from 'next/server'
 // export const dynamic = 'force-dynamic'
 export const runtime = 'edge';
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/apis/v1/nail/vouchers/get`);
+    // Parse the incoming JSON body
+    const body = await req.json();
+    console.log(body)
+    // Access properties directly
+    const { code, phone } = body;
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/apis/v1/nail/vouchers/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code,
+        phone,
+      }),
+    });
 
     if (!response.ok)
       return NextResponse.json({
@@ -20,7 +32,7 @@ export async function GET(req: NextRequest) {
     if (result) {
       return NextResponse.json({
         success: true,
-        data: result.data,
+        data: result,
       }, {
         status: response.status,
       })

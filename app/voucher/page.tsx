@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import forge from "node-forge";
 import {
   Download,
   Ticket,
@@ -14,26 +15,28 @@ import {
   CheckCircle2
 } from "lucide-react";
 
+const cleanBase64 = (process.env.NEXT_PUBLIC_QR_PUBLIC_KEY_BASE64 || '').replace(/\s+/g, '');
+const PUBLIC_KEY_PEM = atob(cleanBase64);
+
 export default function VoucherQrGenerator() {
   const [loading, setLoading] = useState(true);
-  const [voucher, setVoucher] =  useState(null);
-
   // 1. States cho thông tin Voucher
-  const [voucherCode, setVoucherCode] = useState("NAILVIP50");
+  const [voucherCode, setVoucherCode] = useState(""); //"NAILVIP50"
   const [phone, setPhone] = useState("");
   const [startDate, setStartDate] = useState(
-    new Date().toISOString().split("T")[0]
+    new Date().toLocaleDateString('en-GB').split("T")[0]
   );
   const [expiryDate, setExpiryDate] = useState(
-    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
+    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB').split("T")[0]
   );
 
   // 2. State cấu hình QR & Validation
   const [phoneError, setPhoneError] = useState("");
-  const [qrType, setQrType] = useState<"dynamic" | "static">("dynamic");
+  const [qrType, setQrType] = useState<"dynamic" | "static">("static");
   const [fgColor, setFgColor] = useState("#1e1b4b");
   const [bgColor, setBgColor] = useState("#ffffff");
   const [isSaving, setIsSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string|null>(null);
 
   const qrRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +62,7 @@ export default function VoucherQrGenerator() {
   };
 
   // Tạo URL/Nội dung mã QR dựa trên loại QR
-  const domain = typeof window !== "undefined" ? window.location.origin : "https://nailsxanh.com";
+  const domain = typeof window !== "undefined" ? window.location.origin : "https://nailsxanh.ddns.net";
   
   // Link quét/tra cứu Voucher: Trỏ đến API tra cứu kèm mã voucher và SĐT
   const dynamicUrl = `${domain}/api/voucher/verify?code=${encodeURIComponent(voucherCode)}&phone=${encodeURIComponent(phone)}`;
@@ -72,7 +75,33 @@ export default function VoucherQrGenerator() {
     expired: expiryDate,
   });
 
-  const finalQrValue = qrType === "dynamic" ? dynamicUrl : staticPayload;
+  const getEncryptedStaticPayload = () => {
+    const rawJson = JSON.stringify({
+      code: voucherCode,
+      phone: phone,
+      created: startDate,
+      expired: expiryDate,
+    });
+
+    try {
+      // Đọc public key từ định dạng PEM
+      const publicKey = forge.pki.publicKeyFromPem(PUBLIC_KEY_PEM);
+      
+      // Mã hóa chuỗi JSON bằng thuật toán RSA-OAEP (Bảo mật cao)
+      const encryptedBytes = publicKey.encrypt(rawJson, 'RSA-OAEP', {
+        md: forge.md.sha256.create()
+      });
+      
+      // Chuyển kết quả mã hóa sang dạng Base64 để nhét vào mã QR
+      return forge.util.encode64(encryptedBytes);
+    } catch (err) {
+      console.error("Lỗi mã hóa RSA:", err);
+      return "ERROR_ENCRYPTION_FAILED";
+    }
+  };
+
+  // const finalQrValue = qrType === "dynamic" ? dynamicUrl : staticPayload;
+  const finalQrValue = qrType === "dynamic" ? dynamicUrl : getEncryptedStaticPayload();
 
   // Xử lý Lưu DB & Download Ảnh
   const handleDownloadAndSave = async () => {
@@ -87,20 +116,35 @@ export default function VoucherQrGenerator() {
       setIsSaving(true);
 
       // Lưu thông tin Voucher vào Cơ sở dữ liệu qua API Prisma
-      if (qrType === "dynamic") {
-        const response = await fetch("/api/voucher", {
+      if (qrType === "static")
+      {
+        const response = await fetch("/api/voucher/verify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             code: voucherCode,
-            customerPhone: phone,
+            phone: phone,
             startDate: new Date(startDate),
             expiryDate: new Date(expiryDate),
           }),
         });
 
         if (!response.ok) {
-          throw new Error("Không thể lưu thông tin Voucher vào cơ sở dữ liệu!");
+          // throw new Error("Không thể lưu thông tin Voucher vào cơ sở dữ liệu!");
+          setErrorMessage("Voucher đã hết, xin chờ dịp khác");
+          return ;
+        }
+        
+        const resJson = await response.json();
+        const data = resJson.data;
+        if (resJson.success === false) { console.log('Go');
+          setErrorMessage("Voucher đã hết, xin chờ dịp khác");
+          return;
+        }
+
+        if (data.error) {
+          setErrorMessage(data.message);
+          return;
         }
       }
 
@@ -127,7 +171,10 @@ export default function VoucherQrGenerator() {
       if (true) {
         const voucherRes = await fetch(`/api/voucher`);
         const voucherData = await voucherRes.json();
-        setVoucher(voucherData?.data || null);
+
+        setVoucherCode(voucherData?.data.name || null);
+        setStartDate(new Date(voucherData?.data.start_at).toString())
+        setExpiryDate(new Date(voucherData?.data.end_at).toString())
       }
     } catch (error) {
       console.error("Fetch error:", error);
@@ -138,9 +185,7 @@ export default function VoucherQrGenerator() {
 
   useEffect(() => {
     fetchData();
-    // Cuộn lên đầu khi sang trang mới
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8 font-sans">
@@ -152,10 +197,10 @@ export default function VoucherQrGenerator() {
             <Sparkles className="w-3.5 h-3.5" /> Nails Xanh Voucher
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Tặng QR Voucher Khách Hàng
+            Tặng QR Voucher
           </h1>
           <p className="mt-2 text-slate-600 max-w-xl mx-auto">
-            Tạo mã QR phát hành ưu đãi cho khách hàng, gắn liền với SĐT và thời hạn sử dụng.
+            Nâng niu đôi tay, nhận ngay quà khủng.
           </p>
         </div>
 
@@ -166,7 +211,7 @@ export default function VoucherQrGenerator() {
           <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-5">
             
             {/* Choose QR Type */}
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">Chế độ phát hành</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
@@ -195,7 +240,7 @@ export default function VoucherQrGenerator() {
                   <div className="text-xs text-slate-500 mt-1">Ghi trực tiếp SĐT và Hạn dùng vào ảnh</div>
                 </button>
               </div>
-            </div>
+            </div> */}
 
             {/* Input: Mã Voucher */}
             <div>
@@ -211,6 +256,7 @@ export default function VoucherQrGenerator() {
                   value={voucherCode}
                   onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
                   placeholder="VD: NAILVIP50"
+                  disabled
                   className="block w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm font-mono font-semibold text-slate-800 uppercase focus:ring-pink-500 focus:border-pink-500"
                 />
               </div>
@@ -260,8 +306,10 @@ export default function VoucherQrGenerator() {
                     <Calendar className="w-4 h-4" />
                   </div>
                   <input
-                    type="date"
-                    value={startDate}
+                    type="text"
+                    value={(new Date(startDate).toLocaleDateString('en-GB')).toString()}
+                    placeholder="dd/mm/yyyy"
+                    disabled
                     onChange={(e) => setStartDate(e.target.value)}
                     className="block w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-pink-500 focus:border-pink-500"
                   />
@@ -277,8 +325,10 @@ export default function VoucherQrGenerator() {
                     <Calendar className="w-4 h-4" />
                   </div>
                   <input
-                    type="date"
-                    value={expiryDate}
+                    type="text"
+                    value={(new Date(expiryDate).toLocaleDateString('en-GB')).toString()}
+                    placeholder="dd/mm/yyyy"
+                    disabled
                     min={startDate}
                     onChange={(e) => setExpiryDate(e.target.value)}
                     className="block w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-pink-500 focus:border-pink-500"
@@ -357,11 +407,24 @@ export default function VoucherQrGenerator() {
                     includeMargin={true}
                   />
                 </div>
+                {/* 2. COMPONENT ẨN ĐỂ PHỤC VỤ DOWNLOAD FILE 512PX (Không hiển thị trên màn hình) */}
+                <div ref={qrRef} style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+                  <QRCodeCanvas 
+                    value={finalQrValue} 
+                    size={512} // Kích thước siêu lớn, siêu nét khi tải về máy
+                    level="H" 
+                    fgColor={fgColor} 
+                    bgColor={bgColor} 
+                  />
+                </div>
 
                 {/* Thông tin hiển thị trên thẻ */}
                 <div className="mt-3 pt-3 border-t border-white/20 text-xs space-y-1 text-pink-100 text-left">
                   <p><span className="font-medium text-white">SĐT Khách:</span> {phone || "Chưa nhập"}</p>
-                  <p><span className="font-medium text-white">Hạn dùng:</span> {startDate} đến {expiryDate}</p>
+                  <p><span className="font-medium text-white">Hạn dùng:</span> {(new Date(startDate).toLocaleDateString('en-GB')).toString()} đến {(new Date(expiryDate).toLocaleDateString('en-GB')).toString()}</p>
+                  {errorMessage && (
+                    <p><span className="font-medium !text-green"><strong>Thông báo: {errorMessage}</strong></span></p>
+                  )}
                 </div>
               </div>
 
