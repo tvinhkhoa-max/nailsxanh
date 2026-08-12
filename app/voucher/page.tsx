@@ -39,6 +39,7 @@ export default function VoucherQrGenerator() {
   const [errorMessage, setErrorMessage] = useState<string|null>(null);
 
   const qrRef = useRef<HTMLDivElement>(null);
+  const downloadQrRef = useRef<HTMLDivElement>(null);
 
   // Validate Số điện thoại (Chỉ cho phép nhập số & kiểm tra định dạng SĐT Việt Nam)
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,13 +150,71 @@ export default function VoucherQrGenerator() {
       }
 
       // Tải file QR PNG về máy
-      const canvas = qrRef.current?.querySelector("canvas");
+      // const canvas = qrRef.current?.querySelector("canvas");
+      const canvas = downloadQrRef.current?.querySelector("canvas");
       if (canvas) {
-        const image = canvas.toDataURL("image/png");
+        // const image = canvas.toDataURL("image/png");
+        // const anchor = document.createElement("a");
+        // anchor.href = image;
+        // anchor.download = `Voucher-QR-${voucherCode}-${phone}.png`;
+        // anchor.click();
+        const blob = await new Promise<Blob>((resolve, reject) => {
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error("Không thể tạo PNG"));
+            }
+          }, "image/png");
+        });
+
+        const fileName = `Voucher-QR-${voucherCode}-${phone}.png`;
+        const file = new File([blob], fileName, {
+          type: "image/png",
+        });
+
+        const isIOS =
+          /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+          (
+            navigator.platform === "MacIntel" &&
+            navigator.maxTouchPoints > 1
+          );
+
+        // iPhone / iPad
+        if (isIOS) {
+          if (
+            navigator.share &&
+            navigator.canShare?.({ files: [file] })
+          ) {
+            await navigator.share({
+              files: [file],
+              title: "QR Voucher",
+            });
+
+            return;
+          }
+
+          // fallback iOS
+          const url = URL.createObjectURL(blob);
+          window.open(url, "_blank");
+
+          return;
+        }
+
+        // PC / Android
+        const url = URL.createObjectURL(blob);
+
         const anchor = document.createElement("a");
-        anchor.href = image;
-        anchor.download = `Voucher-QR-${voucherCode}-${phone}.png`;
+        anchor.href = url;
+        anchor.download = fileName;
+
+        document.body.appendChild(anchor);
         anchor.click();
+        anchor.remove();
+
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+        }, 1000);
       }
     } catch (error) {
       console.error("Lỗi khi tạo Voucher QR:", error);
@@ -209,38 +268,6 @@ export default function VoucherQrGenerator() {
           
           {/* CỘT NHẬP THÔNG TIN VOUCHER (7 Cột) */}
           <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-5">
-            
-            {/* Choose QR Type */}
-            {/* <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Chế độ phát hành</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setQrType("dynamic")}
-                  className={`p-3 text-left border rounded-xl transition-all ${
-                    qrType === "dynamic"
-                      ? "border-pink-500 bg-pink-50/50 ring-2 ring-pink-500/20"
-                      : "border-slate-200 hover:border-slate-300"
-                  }`}
-                >
-                  <div className="font-semibold text-sm text-slate-900">QR Động (Tra cứu DB)</div>
-                  <div className="text-xs text-slate-500 mt-1">Lưu Database, quét để check hạn & SĐT</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setQrType("static")}
-                  className={`p-3 text-left border rounded-xl transition-all ${
-                    qrType === "static"
-                      ? "border-pink-500 bg-pink-50/50 ring-2 ring-pink-500/20"
-                      : "border-slate-200 hover:border-slate-300"
-                  }`}
-                >
-                  <div className="font-semibold text-sm text-slate-900">QR Tĩnh (Chứa Text/JSON)</div>
-                  <div className="text-xs text-slate-500 mt-1">Ghi trực tiếp SĐT và Hạn dùng vào ảnh</div>
-                </button>
-              </div>
-            </div> */}
 
             {/* Input: Mã Voucher */}
             <div>
@@ -408,7 +435,9 @@ export default function VoucherQrGenerator() {
                   />
                 </div>
                 {/* 2. COMPONENT ẨN ĐỂ PHỤC VỤ DOWNLOAD FILE 512PX (Không hiển thị trên màn hình) */}
-                <div ref={qrRef} style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+                <div
+                  ref={downloadQrRef}
+                  style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
                   <QRCodeCanvas 
                     value={finalQrValue} 
                     size={512} // Kích thước siêu lớn, siêu nét khi tải về máy
